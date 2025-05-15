@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Video Prediction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #f5f5f5;
+            background-image: url("images/bg.jpg");
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+            backdrop-filter: blur(10px) saturate(180%);
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 0px 2px 0px black,
+                          0px 3px 0px black;
+            color: white;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+            font-size: 1.1em;
+            padding: 10px 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .form-control-file {
+            border: 2px dashed #bdc3c7;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #result-section {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        #prediction-result {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center">Traffic Prediction System</h1>
+        <p class="text-center">Upload your traffic video, and our system will analyze it to predict congestion or
+            traffic patterns using advanced machine learning algorithms.</p>
+
+        <!-- Upload Form -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form id="upload-form" method="POST" enctype="multipart/form-data" action="/upload">
+                    <div class="form-group">
+                        <label for="videoFile" style="color:white;">Upload Traffic Video File:</label>
+                        <input type="file" class="form-control-file" id="videoFile" name="videoFile" accept="video/*"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Upload & Predict</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Prediction Result Section -->
+        <div id="result-section" class="mt-5 text-center" style="display:none;">
+            <h3>Prediction Result</h3>
+            <p id="prediction-result"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("upload-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("/upload", {
+                method: "POST",
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result-section").style.display = "block";
+                    document.getElementById("prediction-result").innerHTML = `
+            <strong>Left Lane:</strong> ${data.left_lane} - ${data.traffic_intensity_left} <br>
+            <strong>Right Lane:</strong> ${data.right_lane} - ${data.traffic_intensity_right}
+        `;
+                })
+                .catch(error => {
+                    alert("Error predicting traffic: " + error);
+                });
+        });
+
+    </script>
+</body>
+
+</html>
